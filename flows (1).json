@@ -1,0 +1,217 @@
+[
+    {
+        "id": "276146b1af7f9fa4",
+        "type": "tab",
+        "label": "Monitoring Air",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "05844501fe6555ce",
+        "type": "mqtt in",
+        "z": "276146b1af7f9fa4",
+        "name": "",
+        "topic": "project/satria/iot",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "c1ec52ea2a108370",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 160,
+        "wires": [
+            [
+                "dbe0ba2286351f43",
+                "fe078644d1e62927"
+            ]
+        ]
+    },
+    {
+        "id": "dbe0ba2286351f43",
+        "type": "json",
+        "z": "276146b1af7f9fa4",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 370,
+        "y": 160,
+        "wires": [
+            [
+                "bfdaf548da09974f"
+            ]
+        ]
+    },
+    {
+        "id": "bfdaf548da09974f",
+        "type": "ui-template",
+        "z": "276146b1af7f9fa4",
+        "group": "d4110f878d8c93c5",
+        "page": "",
+        "ui": "",
+        "name": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"cyber-container\">\n    <!-- Header -->\n    <div class=\"cyber-header\">\n      <div class=\"title\">CYBER AQUA MONITORING</div>\n      <div class=\"subtitle\">System Unit: {{ payload.nama || 'Pintu Air Satria' }}</div>\n      <div class=\"badge\">STREAMING DATA</div>\n    </div>\n\n    <!-- Center Animation Box -->\n    <div class=\"main-visual\">\n      <div class=\"water-box\">\n        <!-- Visual Tinggi Air -->\n        <div class=\"water-level\" \n             :style=\"{ \n               height: (payload.tinggiAir / 5) + '%', \n               backgroundColor: payload.tinggiAir > 350 ? '#ff0055' : (payload.tinggiAir > 200 ? '#ffb700' : '#00f0ff') \n             }\">\n        </div>\n        <!-- Bubble Animation -->\n        <div class=\"bubble b1\"></div>\n        <div class=\"bubble b2\"></div>\n        <div class=\"water-text\">\n          {{ ((payload.tinggiAir / 500) * 100).toFixed(0) }}%\n        </div>\n      </div>\n      <div class=\"quote\">\"Sistem Air Terjaga Dalam Mode Otomatis Realtime\"</div>\n    </div>\n\n    <!-- Cards Data -->\n    <div class=\"card-group\">\n      <div class=\"card\">\n        <span class=\"card-label\">💧 TINGGI AIR</span>\n        <span class=\"card-value\" :style=\"{ color: payload.tinggiAir > 350 ? '#ff0055' : '#00f0ff' }\">\n          {{ payload.tinggiAir }} <small>cm</small>\n        </span>\n      </div>\n\n      <div class=\"card\">\n        <span class=\"card-label\">📏 JARAK SENSOR</span>\n        <span class=\"card-value\">\n          {{ payload.jarakSensor }} <small>cm</small>\n        </span>\n      </div>\n    </div>\n\n    <!-- Footer Status -->\n    <div class=\"footer-status\">\n      <span class=\"f-label\">INDIKATOR PARAMETER SUNGAI</span>\n      <div class=\"f-badge\">\n        <span class=\"dot\" :style=\"{ backgroundColor: payload.tinggiAir > 350 ? '#ff0055' : (payload.tinggiAir > 200 ? '#ffb700' : '#00f0ff') }\"></span>\n        {{ payload.tinggiAir > 350 ? 'BAHAYA / SIAGA 1' : (payload.tinggiAir > 200 ? 'WASPADA' : 'AMAN/NORMAL') }}\n      </div>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      payload: {\n        nama: 'Pintu Air Satria',\n        tinggiAir: 0,\n        jarakSensor: 0\n      }\n    }\n  },\n  watch: {\n    msg: {\n      fill: true,\n      handler(val) {\n        if (val && val.payload) {\n          this.payload = typeof val.payload === 'string' ? JSON.parse(val.payload) : val.payload;\n        }\n      }\n    }\n  }\n}\n</script>\n\n<style>\n  .cyber-container {\n    background: #040c1a;\n    border: 1px solid #0e2a4a;\n    border-radius: 16px;\n    padding: 16px;\n    color: #fff;\n    font-family: Arial, sans-serif;\n  }\n  .cyber-header {\n    text-align: center;\n    position: relative;\n    margin-bottom: 15px;\n  }\n  .title { font-size: 16px; font-weight: bold; color: #00f0ff; letter-spacing: 1px; }\n  .subtitle { font-size: 10px; color: #4a6b8c; margin-top: 2px; }\n  .badge { position: absolute; right: 0; top: 0; font-size: 8px; color: #00f0ff; border: 1px solid #00f0ff; padding: 2px 6px; border-radius: 8px; }\n  \n  .main-visual { display: flex; flex-direction: column; align-items: center; margin: 15px 0; }\n  .water-box {\n    width: 90px; height: 110px; border: 2px solid #14385c; border-radius: 12px;\n    position: relative; overflow: hidden; background: #010612;\n    display: flex; align-items: center; justify-content: center;\n  }\n  .water-level { position: absolute; bottom: 0; width: 100%; transition: all 0.3s ease; opacity: 0.7; }\n  .water-text { position: relative; z-index: 5; font-size: 22px; font-weight: bold; text-shadow: 0 2px 4px #000; }\n  \n  .bubble { position: absolute; background: rgba(255,255,255,0.4); border-radius: 50%; animation: rise 3s infinite ease-in; }\n  .b1 { width: 8px; height: 8px; left: 20%; animation-duration: 2.5s; }\n  .b2 { width: 6px; height: 6px; left: 70%; animation-duration: 3.5s; }\n  @keyframes rise { 0% { bottom: -10px; opacity: 0; } 50% { opacity: 1; } 100% { bottom: 110px; opacity: 0; } }\n\n  .quote { font-size: 10px; color: #527394; margin-top: 8px; font-style: italic; }\n  \n  .card-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }\n  .card { background: #08172e; border: 1px solid #123259; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; }\n  .card-label { font-size: 9px; color: #53779e; }\n  .card-value { font-size: 20px; font-weight: bold; margin-top: 4px; }\n  .card-value small { font-size: 11px; color: #fff; }\n  \n  .footer-status { background: #061224; border: 1px solid #102744; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }\n  .f-label { font-size: 9px; color: #4e7096; }\n  .f-badge { font-size: 11px; font-weight: bold; color: #00f0ff; display: flex; align-items: center; gap: 6px; }\n  .dot { width: 8px; height: 8px; border-radius: 50%; }\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fe078644d1e62927",
+        "type": "debug",
+        "z": "276146b1af7f9fa4",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "c1ec52ea2a108370",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d4110f878d8c93c5",
+        "type": "ui-group",
+        "name": "Cyber Dashboard",
+        "page": "24696a373b29f04f",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "24696a373b29f04f",
+        "type": "ui-page",
+        "name": "Monitoring",
+        "ui": "a87fc02a504f2b19",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "d3323188fd933bee",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "a87fc02a504f2b19",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "d3323188fd933bee",
+        "type": "ui-theme",
+        "name": "Dark Theme",
+        "colors": {
+            "surface": "#18191b",
+            "primary": "#2bf3c1",
+            "bgPage": "#111113",
+            "groupBg": "#212225",
+            "groupOutline": "#363a3f"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "32c4d68126cc5e0a",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.32.0"
+        }
+    }
+]
