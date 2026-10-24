@@ -39,10 +39,10 @@ Kalkulasi dilakukan secara langsung pada titik *edge* (ESP32) menggunakan rumus:
   </tr>
   <tr>
     <td align="center">
-      <img src="Screenshot%202026-10-24%20165132.png" width="100%" alt="ESP32 Wokwi Simulation">
+      <img src="ss_circuit_wokwi.jpeg" width="100%" alt="ESP32 Wokwi Simulation">
     </td>
     <td align="center">
-      <img src="Screenshot%202026-10-24%20165243.png" width="100%" alt="Node-RED Dashboard">
+      <img src="ss_dashboard_UI.jpeg" width="100%" alt="Node-RED Dashboard">
     </td>
   </tr>
 </table>
